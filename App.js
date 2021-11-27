@@ -3,8 +3,11 @@ import {
   ActivityIndicator,
   FlatList,
   Text,
+  TextInput,
   View,
   StyleSheet,
+  Alert,
+  Button
 } from "react-native";
 
 export default function App() {
@@ -12,7 +15,7 @@ export default function App() {
   const [data, setData] = useState([]);
   const [lat, setLat] = useState([]);
   const [long, setLong] = useState([]);
-  const [city, setCity] = useState([]);
+  const [city, setCity] = useState('');
   const [country, setCountry] = useState([]);
   const [temperatura, setTemperatura] = useState([]);
 
@@ -21,6 +24,23 @@ export default function App() {
       const response = await fetch(
         "https://api.openweathermap.org/data/2.5/weather?q=Belo horizonte&APPID=4efbe3606dc68b3acd60263d58fa773f"
       );
+      const json = await response.json();
+      setData(json.weather);
+      setCity(json.name);
+      setCountry(json.sys.country);
+      setTemperatura(json.main);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const getWeatherByCity = async (city) => {
+    try {
+      const response = await fetch(
+        'https://api.openweathermap.org/data/2.5/weather?q='+city+'&APPID=4efbe3606dc68b3acd60263d58fa773f'      );
       const json = await response.json();
       setData(json.weather);
       setCity(json.name);
@@ -49,6 +69,11 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <TextInput 
+        value={city}
+        onChangeText={setCity}
+        placeholder="Search" />
+      <Button onPress={()=>{getWeatherByCity(city)}} title="Buscar"/>
       <Text style={styles.headerCard}>
         {city},{country}
       </Text>
